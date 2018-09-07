@@ -1,0 +1,17 @@
+Style/Documentation:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/LineLength:
+  Enabled: false
+
+Style/AccessModifierDeclarations:
+  Enabled: false
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+AllCops:
+  TargetRubyVersion: 2.4
