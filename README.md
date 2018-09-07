@@ -6,6 +6,11 @@ https://docs.google.com/presentation/d/1J3X_q5YcN0_8rj7C7L-V3hx6iDEw3VVSoQgBOjuA
 * Write your tests first, then make them pass
 * Not as weird as it seems
 
+# Common Objection
+
+* I don't know what code I'm going to write until after I write it.
+    * You probably know what it should do (if not how)
+
 # The Process
 
 ![The Process](the_process.png)
@@ -43,33 +48,27 @@ https://docs.google.com/presentation/d/1J3X_q5YcN0_8rj7C7L-V3hx6iDEw3VVSoQgBOjuA
 `spec/lib/game_spec.rb`
 
 ```ruby
-require 'spec_helper'
+require './spec/spec_helper'
 
-RSpec.describe Doug::Game do
+RSpec.describe Game do
 
 end
 ```
 
 * Run test:
-  * uninitialized constant `Doug`
+  * uninitialized constant Game
 
-# Red: Create Class
+# Green: Create Class
 
 `lib/game.rb`
 
 ```ruby
-module Doug
-  class Game
+class Game
 
-  end
 end
 ```
 
-# Green: Import class
-
-* No eager loading with `spec_helper`
-* Have to add `require 'doug/game'`
-
+* I'm using eager loading via `spec_helper`
 * Run test:
   * No failures
 
@@ -86,7 +85,7 @@ end
 context 'when all frames are gutter balls' do
   it 'scores 0' do
     # Arrange
-    game = Doug::Game.new
+    game = Game.new
 
     # Act
     20.times do
@@ -97,9 +96,9 @@ end
 ```
 
 * Run tests
-  * Failure: undefined method `roll' for #<Doug::Game:0x00005595487b1f28>
+  * Failure: undefined method `roll' for #<Game:0x00005595487b1f28>
 
-# Greem: Add the `roll` method
+# Green: Add the `roll` method
 
 * Get to Red
   * Write the least amount of code we can
@@ -119,11 +118,11 @@ end
 expect(game.score).to eq 0
 ```
 
-* undefined method `score' for #<Doug::Game:0x000055ab3d1868c8>
+* undefined method `score' for #<Game:0x000055ab3d1868c8>
 
 # Green: Add `score` method
 
-* TODO: Ask what's the least amount of code I could write to get this test to pass?
+* What's the least amount of code I could write to get this test to pass?
 
 ```ruby
 def score
@@ -134,8 +133,8 @@ end
 * This is a silly bit of code
 * Only works for this one test!
 * That's the point!
-* Our code totally satisfies our requirements
-  * as expressed in our test
+* Our code satisfies our requirements
+  * _as expressed in our test_
 
 # Red: Test for rolling all 1s
 
@@ -143,7 +142,7 @@ end
 context 'when all rolls are 1' do
   it 'scores 20' do
     # Arrange
-    game = Doug::Game.new
+    game = Game.new
 
     # Act
     20.times do
@@ -156,8 +155,8 @@ context 'when all rolls are 1' do
 end
 ```
 
-expected: 20
-got: 0
+> expected: 20 <br />
+> got: 0
 
 * Our code no longer satisfies our examples
 * We need to edit our class so it passes
@@ -192,7 +191,7 @@ end
 context 'when a spare is rolled' do
   it 'scores with correct bonus' do
     # Arrange
-    game = Doug::Game.new
+    game = Game.new
 
     # Act
     game.roll(5)
@@ -211,7 +210,7 @@ got: 13
 
 * Our code doesn't satisfy this requirement
 
-* TODO: Ask what we can do to make this test pass?
+* What we can do to make this test pass?
   * Maybe we add a variable to track the previous roll in `roll`?
   * But.....
   * Observation:
@@ -249,7 +248,7 @@ end
 context 'when game starts' do
   it 'scores 0' do
     # Arrange
-    game = Doug::Game.new
+    game = Game.new
 
     # assert
     expect(game.score).to eq 0
@@ -278,8 +277,9 @@ end
 
 * Run tests:
 * Still:
-expected: 16
-got: 13
+
+> expected: 16<br/>
+> got: 13
 
 # Try 1: how do I calculate the score when we have a spare?
 
@@ -337,6 +337,35 @@ def score
 end
 ```
 
+* `each_slice` gives us this (as an enumerator):
+
+```ruby
+[[5, 5],
+ [3, 0],
+ [0, 0],
+ [0, 0],
+ [0, 0],
+ [0, 0],
+ [0, 0],
+ [0, 0],
+ [0, 0],
+ [0, 0]]
+```
+
+* `each_cons` groups these frames together like so (as an enumerator):
+
+```ruby
+[[[5, 5], [3, 0]],
+ [[3, 0], [0, 0]],
+ [[0, 0], [0, 0]],
+ [[0, 0], [0, 0]],
+ [[0, 0], [0, 0]],
+ [[0, 0], [0, 0]],
+ [[0, 0], [0, 0]],
+ [[0, 0], [0, 0]],
+ [[0, 0], [0, 0]]]
+``` 
+
 * Test for spares passes!!!
   * _But not "when all rolls are 1 scores 20"!!_
   * We get 18 now.
@@ -364,6 +393,7 @@ Extract a method....
 ```ruby
 def frames
   @rolls.
+    concat([0, 0]).
     each_slice(2).
     each_cons(2)
 end
@@ -385,7 +415,7 @@ Anything else?
 context 'when a strike is rolled' do
   it 'scores with correct bonus' do
     # Arrange
-    game = Doug::Game.new
+    game = Game.new
 
     # Act
     game.roll(10)
@@ -445,7 +475,7 @@ def frames
 	# this is more or less the same!
   result[:frames].
     concat([0, 0]).
-    each_cons(3)
+    each_cons(2)
 end
 ```
 
@@ -479,7 +509,7 @@ end
 context 'in all frames' do
   it 'scores 300' do
     # Arrange
-    game = Doug::Game.new
+    game = Game.new
 
     # Act
     12.times { game.roll(10) }
@@ -490,7 +520,7 @@ context 'in all frames' do
 end
 ```
 
-This totally fails:
+This utterly fails:
   * "nil can't be coerced into Integer"
 
 This is because of the way I'm reading frames.
@@ -498,17 +528,17 @@ I need to go back to the drawing board....
 
 # Green: A mess, but it works
 
-0: = 0
-1: 0    + ( 1) 10 + ( 2) 10 + ( 3) 10	= 30
-2: 30   + ( 2) 10 + ( 3) 10 + ( 4) 10 = 60
-3: 30   + ( 3) 10 + ( 4) 10 + ( 5) 10 = 90
-4: 30   + ( 4) 10 + ( 5) 10 + ( 6) 10 = 120
-5: 30   + ( 5) 10 + ( 6) 10 + ( 7) 10 = 150
-6: 30   + ( 6) 10 + ( 7) 10 + ( 8) 10 = 180
-7: 30   + ( 7) 10 + ( 8) 10 + ( 9) 10 = 210
-8: 30   + ( 8) 10 + ( 9) 10 + (10) 10 = 240
-9: 30   + ( 9) 10 + (10) 10 + ( a) 10 = 270
-10: 30  + (10) 10 + ( a) 10 + ( b) 10 = 300
+> 0: = 0<br/>
+> 1: 0    + ( 1) 10 + ( 2) 10 + ( 3) 10	= 30<br/>
+> 2: 30   + ( 2) 10 + ( 3) 10 + ( 4) 10 = 60<br/>
+> 3: 60   + ( 3) 10 + ( 4) 10 + ( 5) 10 = 90<br/>
+> 4: 90   + ( 4) 10 + ( 5) 10 + ( 6) 10 = 120<br/>
+> 5: 120   + ( 5) 10 + ( 6) 10 + ( 7) 10 = 150<br/>
+> 6: 150   + ( 6) 10 + ( 7) 10 + ( 8) 10 = 180<br/>
+> 7: 180   + ( 7) 10 + ( 8) 10 + ( 9) 10 = 210<br/>
+> 8: 210   + ( 8) 10 + ( 9) 10 + (10) 10 = 240<br/>
+> 9: 240   + ( 9) 10 + (10) 10 + ( a) 10 = 270<br/>
+> 10: 270  + (10) 10 + ( a) 10 + ( b) 10 = 300<br/>
 
 * Maybe I `each_cons` frames by 3?
 
@@ -518,11 +548,28 @@ result[:frames].
   each_cons(3)
 ```
 
+```ruby
+[[[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], [10]],
+ [[10], [10], 0],
+ [[10], 0, 0],
+ [0, 0, 0],
+ [0, 0, 0]]
+```
+
 * I'll need to update my `score` method too.
 	* I could end up with up to 12 frames for all strikes
 	* need to make sure I don't calculate beyond 10 frames
 	* Also, I need a way to grab the scores for three strikes in a row
-		* IE: there's no second roll for a strike that happens after another strike
+    * There's no second roll for a strike that happens after another strike
 
 ```ruby
 i = 0
@@ -532,6 +579,12 @@ frames.reduce(0) do |score, (this_frame, next_frame, the_frame_after_that)|
     score
   elsif is_strike(this_frame)
     score + 10 + next_frame[0] + (next_frame[1] || the_frame_after_that[0])
+  elsif is_spare(this_frame)
+    score + 10 + next_frame[0]
+  else
+    score + this_frame[0] + this_frame[1]
+  end
+end
 ```
 
 # Refactor
@@ -551,7 +604,7 @@ def score(total: 0, frame: 1, remaining_rolls: @rolls.dup)
     score(
       total: total + pins + remaining_rolls[0] + remaining_rolls[1],
       frame: frame + 1,
-      remaining_rolls: remaining_rolls
+    remaining_rolls: remaining_rolls
     )
   elsif is_spare(pins, remaining_rolls[0])
     # spare! add two rolls and peak at the next one
@@ -570,3 +623,22 @@ def score(total: 0, frame: 1, remaining_rolls: @rolls.dup)
   end
 end
 ```
+
+* I also need to update how we calculate spares and strikes:
+
+```ruby
+def is_spare(pins1, pins2)
+  pins1 + pins2 == 10
+end
+
+def is_strike(pins)
+  pins == 10
+end
+```
+
+# Conclusions
+
+* TDD drove the design of the game class
+* End result was not necessarily what we expected
+* Allowed us to safely refactor our code as we progressed
+    * We can be confident that our code works as expected
