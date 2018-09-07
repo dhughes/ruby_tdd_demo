@@ -30,7 +30,7 @@ https://docs.google.com/presentation/d/1J3X_q5YcN0_8rj7C7L-V3hx6iDEw3VVSoQgBOjuA
     * In the tenth frame a player who rolls a spare or strike is allowed to roll the extra balls to complete the frame. 
     * No more than three balls can be rolled in tenth frame.
 
-\* Demo gratuitously stolen from the internet
+\* Demo gratuitously stolen from [Uncle Bob's TheBowlingGameKata](http://butunclebob.com/ArticleS.UncleBob.TheBowlingGameKata).
 
 # How would you get started?
 
